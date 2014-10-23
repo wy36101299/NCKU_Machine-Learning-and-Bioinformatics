@@ -1,4 +1,5 @@
-import glob   
+import glob
+import os
 import pandas as pd
 
 class CTD(object):
@@ -45,16 +46,25 @@ class CTD(object):
                 a = -2
             else:
                 a = 0
-            a = [a,feature]
-            a = a+format_l[index+1]+format_l[index+2]+format_l[index+3]
+            a = [a]+format_l[index+1]+format_l[index+2]+format_l[index+3]+[feature]
             self.td_l.append(a)
 
-    def storage(self):
+    def storage_csv(self):
         rowname=['classify','feature','1-open','1-high','1-low','1-close','1-volume','1-adj close','2-open','2-high','2-low','2-close','2-volume','2-adj close','3-open','3-high','3-low','3-close','3-volume','3-adj close']
         df = pd.DataFrame(self.td_l,columns=rowname)
         with open('./traindata/td_'+self.formatname+'.csv', 'w') as f:
             df.to_csv(f)
             print('td_'+self.formatname+'.csv is creat!')
+
+    def storage_txt(self):
+        with open('train_data','ab') as f:
+            for a in self.td_l:
+                b = str(a[0])+'\t'
+                for c in range(1,20):
+                    d = str(c)+':'+str(a[c])+'\t'
+                    b += d
+                # print(b)
+                f.write(b+'\n')
 
     def run(self):
         path = './stock/*'   
@@ -62,7 +72,10 @@ class CTD(object):
         for path in paths:
             self.format(path)
             self.trainData()
-            self.storage()
+            # self.storage_txt()
+            # self.storage_csv()
+            print os.popen("./bin/svm-scale -s train_scale_model train_data > train_data.scale").read()
+            print os.popen("./bin/rvkde --best --cv --classify -n 5 -v train_data.scale > train_result").read()
 
 def main():
     ctd = CTD()
