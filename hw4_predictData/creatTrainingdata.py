@@ -69,6 +69,8 @@ class CTD(object):
         path = './stock/*'   
         paths=glob.glob(path)
         for path in paths:
+            self.format_l = []
+            self.td_l = []
             self.format(path)
             self.trainData()
 
