@@ -32,12 +32,15 @@ class CTD(object):
 
     def trainData(self):
         for index in range(self.iternum):
-            format_l = self.format_l
-            classify = (float(format_l[index][3])-float(format_l[index+1][3]))/float(format_l[index+1][3])*100
-            feature = self.feature(index)
-            
-            a = ['0']+format_l[index+1]+format_l[index+2]+format_l[index+3]+[feature]
-            self.td_l.append(a)
+            try:
+                format_l = self.format_l
+                classify = (float(format_l[index][3])-float(format_l[index+1][3]))/float(format_l[index+1][3])*100
+                feature = self.feature(index)
+                
+                a = ['0']+format_l[index+1]+format_l[index+2]+format_l[index+3]+[feature]
+                self.td_l.append(a)
+            except:
+                pass
 
     def storage_csv(self):
         rowname=['classify','feature','1-open','1-high','1-low','1-close','1-volume','1-adj close','2-open','2-high','2-low','2-close','2-volume','2-adj close','3-open','3-high','3-low','3-close','3-volume','3-adj close']
@@ -58,7 +61,10 @@ class CTD(object):
     def run(self):
         path = './stock/*'   
         paths=glob.glob(path)
-        for path in paths:
+        for index,path in enumerate(paths,1):
+            print(index)
+            self.format_l = []
+            self.td_l = []
             self.format(path)
             self.trainData()
 
